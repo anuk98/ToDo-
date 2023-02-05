@@ -1,0 +1,45 @@
+.list{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 282px;
+    background-color: #12343b;
+    border: none;
+    color: white;
+    font-size: 20px;
+    padding-left: 10px;
+    padding-right: 15px;
+    border-radius: 10px;
+    margin-bottom: 7px;
+    
+}
+.list p{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.list-item{
+    text-decoration: none;
+}
+.list-clean{
+    text-decoration: line-through;
+}
+.task-btn{
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
+    font-size: 22px;
+    border-radius: 50%;
+}
+.btn-complete{
+    color: #ff6c6c;
+    margin-right: 10px;
+}
+.btn-delete{
+    color: lightseagreen;
+}
+
+.buttons{
+    display: flex;
+    flex-direction: row;
+}

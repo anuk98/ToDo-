@@ -1,64 +1,72 @@
-import React from 'react';
-import { useState } from 'react';
-import './App.css';
+import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import React, { useState } from 'react'
+import "./App.css";
+import Button from '@mui/material/Button';
+import TodoList from './components/TodoList';
+import { db } from './firebase_config';
+import { TextField } from '@mui/material';
+import { useEffect } from 'react';
+
+
+
 function App() {
-  const date=new Date().toDateString();
-   const[todo,setTodo]=useState('');
-  const[newtask,setNewtask]=useState([]);
- const deletetodo=(m)=>{
-  setNewtask(newtask.filter((obj)=>obj.id!==m))
- }
- 
+  const [todos, setTodos] = useState([]);
+  const [todoInput, setTodoInput] = useState("");
+
+  useEffect(() => {
+    getTodos();
+  }, []); 
+
+  function getTodos() {
+    onSnapshot(query(collection(db, "todos"),orderBy('timestamp','desc')), (querySnapshot) => {
+      setTodos(
+        querySnapshot.docs.map((item) => ({
+          id: item.id,
+          todo: item.data().todo,
+          inprogress: item.data().inprogress,
+        })) 
+      )
+  });
+  }
+
+  function addTodo(e) {
+    e.preventDefault();
+    addDoc(collection(db, "todos"), {
+    inprogress: true,
+    timestamp: serverTimestamp(),
+    todo: todoInput,
+    });
+    setTodoInput("");
+  }
+
   return (
     <div className="app">
-      
-      <div className="mainHeading">
-        <h1><span style={{color:'violet'}}>ToDo</span> List</h1>
-      </div>
-      <div className="subHeading">
-        <br />
-        <h2>Whoop, it's Wednesday 🌝 ☕ </h2>
-      </div>
-      <div className="input">
-        <input type="text" placeholder="🖊️ Add item..." onChange={(e)=>{
-          setTodo(e.target.value)
-        }} />
-        <i  class="fas fa-plus" onClick={()=>{
-          setNewtask([...newtask,{text:todo,status:false,id:Date.now()}])
-        }} style={{color:'orange'}}></i>
+      <div className="container">
         
-      </div>
-      {newtask.map((obj)=>{
-        return(
-      <div className="todos">
-        <div className="todo">
-          <div className="left">
-            <input onChange={(e)=>{
-             
-              console.log(obj)
-              setNewtask(newtask.filter((obj2)=>{
-                if(obj2.id===obj.id){
-                  obj2.status=e.target.checked
-                }
-                return obj2
-              })
-             )
-                
-            }} value={obj.status} type="checkbox" name="" id="" />
-            
-            <p>{obj.text}</p>
-            <p1>{date}</p1>
-            
-          </div>
-          
-          <div className="right">
-            <i onClick={()=>{
-              deletetodo(obj.id)
-            }} className="fas fa-times"></i>
-          </div>
+      <h1> Todo List </h1>
+        <form>
+          <input
+            type='text'
+            placeholder='Add Todo...'
+            className='text-input'
+            value={todoInput}
+            onChange={(e) => setTodoInput(e.target.value)}
+          />
+          <button className='add-btn' onClick={addTodo}>
+            Add
+          </button>
+        </form>
+
+        <div >
+          {todos.map((todo) => (
+            <TodoList
+              todo={todo.todo}
+              inprogress={todo.inprogress}
+              id={todo.id}
+            />
+          ))}
         </div>
-      </div>)
-      })}
+      </div>
       
     </div>
   );
